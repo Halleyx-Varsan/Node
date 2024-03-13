@@ -5,14 +5,7 @@ let to = document.getElementById("end");
 let businfo = document.getElementsByClassName("displayBus")[0];
 let totalPrice;
 let numberOfTickets = document.getElementById("totalTicket");
-//lj
-// one
-//two
-//three
-//four fivr
-//four
-//fivre
-//uhyg
+
 const busData = {
     "kmch-gandhipuram":
         [
