@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Commited -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Quicksand:wght@300..700&display=swap"
+        rel="stylesheet" >
+
+    <script src="bus.js"  defer></script>
+
+</head>
+<style>
+    body {
+        /* m */
+        margin: 0;
+        padding: 0;
+        font-family: "Quicksand", sans-serif;
+        height: 100vh;
+        overflow:hidden;
+    }
+
+    .border {
+        position: relative;
+        top: 7%;
+        font-family: "Open Sans", sans-serif;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        /* justify-content: center; */
+        /* margin-top:10%; */
+        /* margin-bottom: auto; */
+    }
+
+    select,
+    #bus {
+        /* height: fit-content; */
+        font-size: 16px;
+        padding: 10px;
+        cursor: pointer;
+        box-sizing: content-box;
+        border-radius: 5px;
+        /* Adjust border radius */
+        border: 1px solid #ccc;
+        margin-right: 10px;
+        /* Add border */
+        /* appearance: none; Remove default appearance */
+    }
+
+    select option {
+        font-family: "Open Sans", sans-serif;
+    }
+
+    h2,
+    h6 {
+        margin: 0;
+        padding: 0;
+    }
+    h2{
+        font-size: 60px;
+        color: #0c00f3;
+        
+    }
+
+    .b-logo {
+        display: flex;
+        align-items: center;
+        font-size: 30px;
+        margin-bottom: 50px;
+    }
+
+    .heading {
+        line-height: 14px;
+    }
+
+    #bus {
+        display: inline;
+    }
+
+    .displayBus {
+        font-size: 16px;
+        margin: 20px 0px 20px 0px;
+        font-family: "Open Sans", sans-serif;
+    }
+
+
+    #select {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+
+
+    button{
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    #userInfo {
+       display: none;
+        position: relative;
+        top:20%;
+        font-family: "Open Sans", sans-serif;
+    justify-content: flex-end;
+    /* align-content: center; */
+    flex-direction: column;
+    align-items: center;
+        
+    }
+
+    .modalWindow {
+        display: none;
+        position: absolute;
+        top: 40%;
+        left: 36%;
+        font-family: "Open Sans", sans-serif;
+        background-color: #007bfffb;
+        padding: 20px;
+        height: 100px;
+        margin: 20px 20px 20px 20px;
+        border-radius: 10px;
+        
+    }
+
+    .modalWindow h4 {
+        margin: 0;
+        position: relative;
+        top: 30%;
+    }
+
+    #close {
+        cursor: pointer;
+        position: absolute;
+        font-size: 20px;
+        top: 2px;
+        right: 5px;
+        margin: 0;
+        /* padding-right:10px; */
+    }
+    #close:hover{
+        font-weight: 900;
+    }
+    #total{
+        display: block;
+        margin-top: 20px;
+        font-weight: 900;
+    }
+</style>
+
+<body>
+
+
+
+    <section id="userInfo">
+        <span class="b-logo">
+            <h2>B</h2>
+            <span class="heading">
+                <h6>lue</h6>
+                <h6>us</h6>
+            </span>
+        </span>
+        
+    </section>
+
+
+
+    <section class="border">
+        <span class="b-logo">
+            <h2>B</h2>
+            <span class="heading">
+                <h6>lue</h6>
+                <h6>us</h6>
+            </span>
+        </span>
+
+        <section class="place">
+            <label for="start">From</label>
+            <select id="start">
+                <option value="" hidden>Choose Starting Place</option>
+                <option value="kmch">KMCH</option>
+                <option value="gandhipuram">Gandhipuram</option>
+                <option value="triuppur">Triuppur</option>
+            </select>
+            <label for="end">To</label>
+            <select id="end">
+                <option value="" hidden>Choose Destination Place</option>
+                <option value="kmch">KMCH</option>
+                <option value="gandhipuram">Gandhipuram</option>
+                <option value="triuppur">Triuppur</option>
+            </select>
+        </section>
+
+        <section class="displayBus">
+
+        </section>
+
+        <section>
+            <h4 id="head"></h4>
+            <span id="price"></span>
+            <h4 id="showDetails"></h4>
+
+
+            <h4 id="totalTickets">Number Of Tickets:</h4>
+            <input id="numberOfTickets">
+            <h4>Amount to be paid: </h4>
+            <span id="total">0.00</span>
+
+
+            <section>
+                <h4>Date Of Travel</h4>
+                <label for="dateBook"></label>
+                <input id="dateBook" type="date">
+            </section>
+
+
+            <section>
+                <h4>Time to Go:</h4>
+                <span id="countdown"></span>
+                <h4 id="showDetails"></h4>
+            </section>
+
+        </section>
+        <!-- <a href="user.html" id="userInfo"> -->
+        <button onclick="preview()">Book Your Ticket</button>
+        <!-- </a> -->
+    </section>
+    
+
+    <section id="preview">
+       
+        <span id="countdown"></span>
+    </section>
+
+<section class="modalWindow">
+    <h4>Please enter the number Of Tickets!!</h4>
+    <p id="close" onclick="closeModalWindow()">x</p>
+</section>
+
+</body>
+</html>
