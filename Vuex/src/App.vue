@@ -1,6 +1,12 @@
 <template>
   <div>
     <async></async>
+
+    {{ $toBold('I am plugin') }}
+    
+    <p v-html="$toBold('fool')"></p>
+    <p v-changecolor="'blue'">hexa</p>
+    <p>{{ toUppercase('uppercase text') }}</p>
     <computedComp></computedComp>
     <watcher></watcher>
     <router-view></router-view>
@@ -94,6 +100,7 @@ export default {
     'async':defineAsyncComponent(()=>import('./VueSlots/asyncComp.vue'),
     alert("I am aync"))
   },
+
   methods: {
     receiveEmit() {
       alert("Hello World! I am from parent component");
