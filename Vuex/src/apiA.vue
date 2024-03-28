@@ -1,13 +1,13 @@
 <template>
   <div>
     <h1>Data:</h1>
-    <pre>{{ responseData }}</pre>
+    <p>{{ responseData }}</p>
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue'; 
-// import axios from 'axios';
+
 import  studentServer from '@/config/axiosConfig'
 console.log(studentServer,'exported')
 export default {
@@ -36,5 +36,5 @@ export default {
 </script>
 
 <style>
-/* Add your component styles here */
+
 </style>
