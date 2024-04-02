@@ -22,8 +22,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(subject, index) in responseData" :key="subject._id">
-            <td>{{ index + 1 }}</td>
+          <tr v-for="(subject, index) in displayedData" :key="subject._id">
+            <td>{{ startIndex + index }}</td>
             <td>{{ subject.name }}</td>
             <td>{{ subject.id }}</td>
             <td>
@@ -55,7 +55,7 @@
 
     <section>
       <label for="totalrows">Rows per page</label>
-      <select v-model="selectedRows" id="totalrows" @change="getTotalRows">
+      <select v-model="selectedRows" id="totalrows" @change="previousPage">
         <option value="5">5</option>
         <option value="10">10</option>
         <option value="15">15</option>
@@ -67,17 +67,18 @@
     </section>
 
     <section class="pagination">
-      <span>
+      <span @click="previousPage">
         <i class="fa fa-arrow-left"></i>
       </span>
 
-      <span v-for="subject in responseData" :key="subject._id">
-        <span class="active-page">{{
-          Math.ceil(this.responseData.length / parseInt(this.selectedRows))
-        }}</span>
+      <!-- <span v-for="subject in endIndex" :key="subject._id">
+        <span class="active-page">{{Math.ceil(responseData.length/subject)}}</span>
+      </span> -->
+      <span v-for="page in totalPages" :key="page" :class="{ 'active-page': currentPage === page }" @click="changePage(page)">
+        {{ page }}
       </span>
 
-      <span>
+      <span @click="nextPage">
         <i class="fa fa-arrow-right"></i>
       </span>
     </section>
@@ -85,7 +86,7 @@
 </template>
 
 <script>
-import {studentServer} from "@/config/axiosConfig.js";
+import  studentServer  from "@/config/axiosConfig.js";
 export default {
   data() {
     return {
@@ -105,13 +106,16 @@ export default {
       return (this.currentPage - 1) * parseInt(this.selectedRows) + 1;
     },
     endIndex() {
-      const selectedRows = parseInt(this.selectedRows);
-      let endIndex = this.currentPage * selectedRows;
-      if (
-        endIndex > this.responseData.length ||selectedRows > this.responseData.length) {
-        endIndex = selectedRows;
-      }
-      return endIndex;
+      let end = this.currentPage * parseInt(this.selectedRows);
+      return Math.min(end, this.responseData.length);
+    },
+    totalPages() {
+      return Math.ceil(this.responseData.length / parseInt(this.selectedRows));
+    },
+    displayedData() {
+      console.log("Start :",this.startIndex);
+      console.log("End :",this.endIndex);
+      return this.responseData.slice(this.startIndex - 1, this.endIndex);
     },
   },
 
@@ -141,7 +145,7 @@ export default {
         } else if (response.status === 404) {
           console.log("Invalid Subject ID");
         } else {
-          console.log("Unexpected response status:", response.status);
+          console.log("Unexpected response status :", response.status);
         }
         this.showModal = false;
       } catch (error) {
@@ -164,8 +168,18 @@ export default {
       }
       this.fetchData();
     },
-    getTotalRows() {
-      console.log("Selected rows per page:", this.selectedRows);
+    changePage(page) {
+      this.currentPage = page;
+    },
+    previousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
     },
   },
 };
@@ -335,12 +349,13 @@ export default {
   .pagination span {
     margin-left: 8px;
     padding: 12px;
+    border-radius: 40%;
   }
 
-  .pagination span:hover.active-page {
+  .pagination span.active-page {
     background-color: #54bd95;
     border: none;
-    border-radius: 24px;
+    border-radius: 50%;
   }
 }
 </style>
