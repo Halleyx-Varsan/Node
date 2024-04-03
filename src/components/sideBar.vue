@@ -5,8 +5,8 @@
     </section>
     <section class="optionandexit">
       <section class="option">
-        <span><img src="../assets/icon-primary.png" /></span>
-        <span><img src="../assets/icon-primary.png" /></span>
+        <span @click="studentServer()"><img src="../assets/icon-primary.png" /></span>
+        <span @click="agentServer()"><img src="../assets/icon-primary.png" /></span>
       </section>
       <section class="exit">
         <span><img src="../assets/icon-primary.png" /></span>
@@ -17,7 +17,20 @@
 </template>
 
 <script>
-export default {};
+import router from '@/router';
+
+// import { agentServer, studentServer } from '@/config/axiosConfig';
+
+export default {
+  methods:{
+    studentServer(){
+      router.push('/subject')
+    },
+    agentServer(){
+      router.push("/agent")
+    }
+  }
+};
 </script>
 
 <style lang="scss">

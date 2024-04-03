@@ -1,9 +1,9 @@
 <template>
   <section class="product-offering">
     <span class="student-header">
-      <span class="student-header-title"> Product offering </span>
+      <span class="student-header-title"> Subjects info </span>
       <span class="student-header-body">
-        Centralised catalog for products
+        Subjects from scratch
       </span>
     </span>
 
@@ -16,9 +16,10 @@
         <thead>
           <tr>
             <th>S.no</th>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Delete</th>
+            <th>Subject name</th>
+            <th>Subject id</th>
+            <th>Action</th>
+            <th>Edit</th>
           </tr>
         </thead>
         <tbody>
@@ -29,6 +30,13 @@
             <td>
               <button class="delete-student" @click="deleteStudent(subject.id)">
                 Delete
+              </button>
+            </td>
+            <td>
+              <button
+                class="delete-student"
+                @click="editStudentModalWindow(subject)">
+                Edit
               </button>
             </td>
           </tr>
@@ -53,49 +61,80 @@
       </section>
     </section>
 
-    <section>
-      <label for="totalrows">Rows per page</label>
-      <select v-model="selectedRows" id="totalrows" @change="previousPage">
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="15">15</option>
-      </select>
-      <span>
-        Showing {{ startIndex }} - {{ endIndex }} of
-        {{ responseData.length }} results
-      </span>
+    <section v-if="editModal" class="modal-window">
+      <section class="modal-window-content">
+        <span>
+          <span @click="close()" class="close">&times;</span>
+          <span class="modal-header">Edit student</span>
+          <hr />
+        </span>
+        <span class="student-info">
+          <label id="student-name" for="student-name">Student name :</label>
+          <input id="student-name" v-model="updatedname" /><br />
+          <label for="student-dob">Subject ID :</label>
+          <input id="student-dob" v-model="updatedid" placeholder="SCS100" />
+          <button @click="close()" class="add-button">Cancel</button>
+          <button
+            @click="updateSubject(updatedid, updatedname)"
+            class="add-button">
+            Save
+          </button>
+        </span>
+      </section>
     </section>
+    <section class="paginationinfo">
+      <section>
+        <label for="totalrows">Rows per page</label>
+        <select v-model="selectedRows" id="totalrows" @change="previousPage">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+        </select>
+        <span>
+          Showing {{ startIndex }} - {{ endIndex }} of
+          {{ responseData.length }} results
+        </span>
+      </section>
 
-    <section class="pagination">
-      <span @click="previousPage">
-        <i class="fa fa-arrow-left"></i>
-      </span>
+      <section class="pagination">
+        <span @click="previousPage">
+          <i class="fa fa-arrow-left"></i>
+        </span>
 
-      <!-- <span v-for="subject in endIndex" :key="subject._id">
+        <!-- <span v-for="subject in endIndex" :key="subject._id">
         <span class="active-page">{{Math.ceil(responseData.length/subject)}}</span>
       </span> -->
-      <span v-for="page in totalPages" :key="page" :class="{ 'active-page': currentPage === page }" @click="changePage(page)">
-        {{ page }}
-      </span>
+        <span
+          v-for="page in totalPages"
+          :key="page"
+          :class="{ 'active-page': currentPage === page }"
+          @click="changePage(page)"
+        >
+          {{ page }}
+        </span>
 
-      <span @click="nextPage">
-        <i class="fa fa-arrow-right"></i>
-      </span>
+        <span @click="nextPage">
+          <i class="fa fa-arrow-right"></i>
+        </span>
+      </section>
     </section>
   </section>
 </template>
 
 <script>
-import  studentServer  from "@/config/axiosConfig.js";
+import studentServer from "@/config/axiosConfig.js";
 export default {
   data() {
     return {
       showModal: false,
+      editModal: false,
       responseData: [],
       subjectname: "",
       subjectid: "",
       selectedRows: "5",
       currentPage: 1,
+      updatedname: "",
+      updatedid: "",
     };
   },
   mounted() {
@@ -113,8 +152,8 @@ export default {
       return Math.ceil(this.responseData.length / parseInt(this.selectedRows));
     },
     displayedData() {
-      console.log("Start :",this.startIndex);
-      console.log("End :",this.endIndex);
+      console.log("Start :", this.startIndex);
+      console.log("End :", this.endIndex);
       return this.responseData.slice(this.startIndex - 1, this.endIndex);
     },
   },
@@ -123,8 +162,14 @@ export default {
     addStudentModalWindow() {
       this.showModal = true;
     },
+    editStudentModalWindow(subject) {
+      this.updatedname = subject.name;
+      this.updatedid = subject.id;
+      this.editModal = true;
+    },
     close() {
       this.showModal = false;
+      this.editModal = false;
     },
     async fetchData() {
       try {
@@ -140,16 +185,33 @@ export default {
           name: this.subjectname,
           id: this.subjectid,
         });
-        if (response.status === 200) {
+        if (response.status === 201) {
+          this.responseData.unshift(response.data);
           console.log(response.data);
         } else if (response.status === 404) {
           console.log("Invalid Subject ID");
         } else {
-          console.log("Unexpected response status :", response.status);
+          console.log(
+            "Subject already exits,unexpected response status :",
+            response.status
+          );
         }
         this.showModal = false;
       } catch (error) {
         console.log("Error in post method :", error);
+      }
+      // this.fetchData();
+    },
+    async updateSubject(updatedid, updatedname) {
+      try {
+        const response = await studentServer.put(`/subject/${this.updatedid}`, {
+          name: updatedname,
+          id: updatedid,
+        });
+        console.log("Subject updated successfully:", response.data);
+        this.editModal = false;
+      } catch (error) {
+        console.log("Error in updating subject :", error);
       }
       this.fetchData();
     },
@@ -238,7 +300,8 @@ export default {
     table-layout: fixed;
     border: 1px solid;
     border-radius: 10px;
-    overflow: hidden;
+    overflow: auto;
+    // display: flex;
 
     th,
     td {
@@ -254,26 +317,33 @@ export default {
       font-size: 14px;
       font-weight: 600;
     }
+    tbody {
+      border: 2px solid;
+      border-color: gray;
+      border-radius: 20px;
+    }
 
     th:first-child,
     td:first-child {
-      width: 10%;
+      width:fit-content
     }
 
-    th:nth-child(2),
+    // th:nth-child(2),
+    // td:nth-child(2) {
+    //   width: 30%;
+    // }
     td:nth-child(2) {
-      width: 30%;
+      color: rgb(0, 50, 248);
     }
-    td:nth-child(2) {
-      color: rgb(0, 120, 248);
-    }
-    th:nth-child(3),
-    td:nth-child(3) {
-      width: 30%;
-    }
-    th:nth-child(4),
-    td:nth-child(4) {
-      width: 10%;
+    // th:nth-child(3),
+    // td:nth-child(3) {
+    //   width: 30%;
+    // }
+    th:nth-child(4),  th:nth-child(5),
+    td:nth-child(4)
+    td:nth-child(5) {
+      width: 5%;
+      padding: 8px;
     }
     .delete-student {
       @include button;
@@ -346,6 +416,20 @@ export default {
       }
     }
   }
+  .paginationinfo {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    position: fixed;
+    bottom: 0;
+    padding-bottom: 16px;
+    width: -webkit-fill-available;
+    .totalrows {
+      display: flex;
+    }
+  }
+
   .pagination span {
     margin-left: 8px;
     padding: 12px;

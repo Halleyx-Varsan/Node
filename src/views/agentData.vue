@@ -1,9 +1,9 @@
 <template>
   <section class="product-offering">
     <span class="student-header">
-      <span class="student-header-title"> Product offering </span>
+      <span class="student-header-title"> Agents info </span>
       <span class="student-header-body">
-        Centralised catalog for products
+        Agents from LA
       </span>
     </span>
 
@@ -21,6 +21,7 @@
             <th>Section</th>
             <th>Standard</th>
             <th>Delete</th>
+            <th>Edit</th>
           </tr>
         </thead>
         <tbody>
@@ -33,9 +34,15 @@
             <td>
               <button
                 class="delete-student"
-                @click="deleteStudent(subject.name)"
-              >
+                @click="deleteStudent(subject.name)">
                 Delete
+              </button>
+            </td>
+            <td>
+              <button
+                class="delete-student"
+                @click="editStudentModalWindow(subject)">
+                Edit
               </button>
             </td>
           </tr>
@@ -64,31 +71,65 @@
       </section>
     </section>
 
-    <section>
-      <label for="totalrows">Rows per page</label>
-      <select v-model="selectedRows" id="totalrows" @change="previousPage()">
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="15">15</option>
-      </select>
-      <span>
-        Showing {{ startIndex }} - {{ endIndex }} of
-        {{ responseData.length }} results
-      </span>
+    <section v-if="editModal" class="modal-window">
+      <section class="modal-window-content">
+        <span>
+          <span @click="close()" class="close">&times;</span>
+          <span class="modal-header">Edit student</span>
+          <hr />
+        </span>
+        <span class="student-info">
+          <label id="student-name" for="student-name">Student name :</label>
+          <input id="student-name" v-model="updatedname" /><br />
+          <label for="student-dob">Email  :</label>
+          <input id="student-dob" v-model="updatedemail"/>
+          <label for="student-dob">Section  :</label>
+          <input id="student-dob" v-model="updatedsection"/>
+          <label for="student-dob">Standard  :</label>
+          <input id="student-dob" v-model="updatedstandard"/>
+          
+          <button @click="close()" class="add-button">Cancel</button>
+          <button
+            @click="updateSubject(updatedname,updatedemail,updatedsection,updatedstandard)"
+            class="add-button">
+            Save
+          </button>
+        </span>
+      </section>
     </section>
 
-    <section class="pagination">
-      <span @click="previousPage">
-        <i class="fa fa-arrow-left"></i>
-      </span>
+    <section class="paginationinfo">
+      <section>
+        <label for="totalrows">Rows per page</label>
+        <select v-model="selectedRows" id="totalrows" @change="previousPage()">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+        </select>
+        <span>
+          Showing {{ startIndex }} - {{ endIndex }} of
+          {{ responseData.length }} results
+        </span>
+      </section>
 
-      <span v-for="page in totalPages" :key="page" :class="{'active-page':currentPage==page}" @click="changePage(page)">
-        {{page}}
-      </span>
+      <section class="pagination">
+        <span @click="previousPage">
+          <i class="fa fa-arrow-left"></i>
+        </span>
 
-      <span @click="nextPage">
-        <i class="fa fa-arrow-right"></i>
-      </span>
+        <span
+          v-for="page in totalPages"
+          :key="page"
+          :class="{ 'active-page': currentPage == page }"
+          @click="changePage(page)"
+        >
+          {{ page }}
+        </span>
+
+        <span @click="nextPage">
+          <i class="fa fa-arrow-right"></i>
+        </span>
+      </section>
     </section>
   </section>
 </template>
@@ -100,6 +141,7 @@ export default {
   data() {
     return {
       showModal: false,
+      editModal: false,
       responseData: [],
       name: "",
       email: "",
@@ -107,6 +149,10 @@ export default {
       sec: "",
       selectedRows: "5",
       currentPage: 1,
+      updatedname: "",
+      updatedemail: "",
+      updatedsection:"",
+      updatedstandard:""
     };
   },
   mounted() {
@@ -114,29 +160,36 @@ export default {
   },
   computed: {
     startIndex() {
-      return ((this.currentPage - 1) *  parseInt(this.selectedRows) + 1);
+      return (this.currentPage - 1) * parseInt(this.selectedRows) + 1;
     },
-    endIndex(){
-        let end=this.currentPage * parseInt(this.selectedRows);
-        return Math.min(end,this.responseData.length)
+    endIndex() {
+      let end = this.currentPage * parseInt(this.selectedRows);
+      return Math.min(end, this.responseData.length);
     },
-    totalPages(){
-        return Math.ceil(this.responseData.length/parseInt(this.selectedRows))
+    totalPages() {
+      return Math.ceil(this.responseData.length / parseInt(this.selectedRows));
     },
-    displayedRows(){
-        console.log("Start :" ,this.startIndex);
-        console.log("End :",this.endIndex);
-        return this.responseData.slice(this.startIndex-1,this.endIndex)
-     
-    }
+    displayedRows() {
+      console.log("Start :", this.startIndex);
+      console.log("End :", this.endIndex);
+      return this.responseData.slice(this.startIndex - 1, this.endIndex);
+    },
   },
 
   methods: {
     addStudentModalWindow() {
       this.showModal = true;
     },
+    editStudentModalWindow(subject) {
+      this.updatedname = subject.name;
+      this.updatedemail = subject.email;
+      this.updatedsection=subject.sec;
+      this.updatedstandard=subject.std;
+      this.editModal = true;
+    },
     close() {
       this.showModal = false;
+      this.editModal=false;
     },
     async fetchData() {
       try {
@@ -167,6 +220,21 @@ export default {
       }
       this.fetchData();
     },
+    async updateSubject(updatedname,updatedemail,updatedsection,updatedstandard) {
+      try {
+        const response = await studentServer.put(`/agent/${this.updatedname}`, {
+          name: updatedname,
+          email: updatedemail,
+          sec:updatedsection,
+          std:updatedstandard
+        });
+        console.log("Response:", response.data);
+        this.editModal = false;
+        this.fetchData();
+      } catch (error) {
+        console.error("Error updating subject:", error);
+      }
+    },
     async deleteStudent(id) {
       try {
         const response = await studentServer.delete(`/agent/${id}`);
@@ -182,15 +250,15 @@ export default {
       }
       this.fetchData();
     },
-    previousPage(){
-        this.currentPage>1?this.currentPage--:null
+    previousPage() {
+      this.currentPage > 1 ? this.currentPage-- : null;
     },
-    nextPage(){
-        this.currentPage<this.totalPages?this.currentPage++:null
+    nextPage() {
+      this.currentPage < this.totalPages ? this.currentPage++ : null;
     },
-    changePage(page){
-        this.currentPage=page
-    }
+    changePage(page) {
+      this.currentPage = page;
+    },
   },
 };
 </script>
@@ -267,32 +335,32 @@ export default {
 
     th:first-child,
     td:first-child {
-      width: 10%;
+      width: 5%;
     }
 
-    th:nth-child(2),
-    td:nth-child(2) {
-      width: 10%;
-    }
-    td:nth-child(2) {
-      color: rgb(0, 120, 248);
-    }
-    th:nth-child(3),
-    td:nth-child(3) {
-      width: 10%;
-    }
-    th:nth-child(4),
-    td:nth-child(4) {
-      width: 10%;
-    }
-    th:nth-child(5),
-    td:nth-child(5) {
-      width: 10%;
-    }
-    th:nth-child(6),
-    td:nth-child(6) {
-      width: 10%;
-    }
+    // th:nth-child(2),
+    // td:nth-child(2) {
+    //   width: 10%;
+    // }
+    // td:nth-child(2) {
+    //   color: rgb(0, 120, 248);
+    // }
+    // th:nth-child(3),
+    // td:nth-child(3) {
+    //   width: 10%;
+    // }
+    // th:nth-child(4),
+    // td:nth-child(4) {
+    //   width: 10%;
+    // }
+    // th:nth-child(5),
+    // td:nth-child(5) {
+    //   width: 10%;
+    // }
+    // th:nth-child(6),
+    // td:nth-child(6) {
+    //   width: 5%;
+    // }
 
     .delete-student {
       @include button;
@@ -365,16 +433,31 @@ export default {
       }
     }
   }
-  .pagination  {
-    margin:24px 8px 0px 8px;
-    padding: 12px;
-  
 
-  .pagination span:hover.active-page {
+  .paginationinfo {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    position: fixed;
+    bottom: 0;
+    padding-bottom: 16px;
+    width: -webkit-fill-available;
+    .totalrows {
+      display: flex;
+    }
+  }
+
+  .pagination span {
+    margin-left: 8px;
+    padding: 12px;
+    border-radius: 40%;
+  }
+
+  .pagination span.active-page {
     background-color: #54bd95;
     border: none;
-    border-radius: 24px;
+    border-radius: 50%;
   }
-}
 }
 </style>

@@ -8,7 +8,7 @@ const routes=
 [
     
     {
-        path:'/student',
+        path:'/subject',
         name:'studentdb',
         component:studentdb
     },
