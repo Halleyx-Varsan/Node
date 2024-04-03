@@ -184,6 +184,7 @@ export default {
       this.updatedname = subject.name;
       this.updatedemail = subject.email;
       this.updatedsection=subject.sec;
+      this.selectedName=subject.name;
       this.updatedstandard=subject.std;
       this.editModal = true;
     },
@@ -222,7 +223,7 @@ export default {
     },
     async updateSubject(updatedname,updatedemail,updatedsection,updatedstandard) {
       try {
-        const response = await studentServer.put(`/agent/${this.updatedname}`, {
+        const response = await studentServer.put(`/agent/${this.selectedName}`, {
           name: updatedname,
           email: updatedemail,
           sec:updatedsection,

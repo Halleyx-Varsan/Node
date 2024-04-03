@@ -1,9 +1,9 @@
 <template>
   <section class="product-offering">
     <span class="student-header">
-      <span class="student-header-title"> Subjects info </span>
+      <span class="student-header-title"> Product offering </span>
       <span class="student-header-body">
-        Subjects from scratch
+        Centralised catalog for products
       </span>
     </span>
 
@@ -164,6 +164,7 @@ export default {
     },
     editStudentModalWindow(subject) {
       this.updatedname = subject.name;
+      this.subjectid=subject.id
       this.updatedid = subject.id;
       this.editModal = true;
     },
@@ -204,16 +205,18 @@ export default {
     },
     async updateSubject(updatedid, updatedname) {
       try {
-        const response = await studentServer.put(`/subject/${this.updatedid}`, {
+        const response = await studentServer.put(`/subject/${this.subjectid}`, {
           name: updatedname,
           id: updatedid,
         });
         console.log("Subject updated successfully:", response.data);
         this.editModal = false;
+        this.fetchData();
+      
       } catch (error) {
         console.log("Error in updating subject :", error);
       }
-      this.fetchData();
+     
     },
     async deleteStudent(id) {
       try {
@@ -339,11 +342,9 @@ export default {
     // td:nth-child(3) {
     //   width: 30%;
     // }
-    th:nth-child(4),  th:nth-child(5),
-    td:nth-child(4)
-    td:nth-child(5) {
+    th:nth-child(4),
+    td:nth-child(4) {
       width: 5%;
-      padding: 8px;
     }
     .delete-student {
       @include button;
